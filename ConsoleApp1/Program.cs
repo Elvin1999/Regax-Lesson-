@@ -42,6 +42,27 @@ namespace ConsoleApp1
                 SerializerToJSON();
             }
         }
+        public void SignIn()
+        {
+            users = DeserializerFromJASON(); List<User> user;
+            string username, password;
+            do
+            {
+                Console.Write("Username - >");
+                username = Console.ReadLine();
+                Console.Write("Password - >");
+                password = Console.ReadLine();
+                user = users.Where(x => x.Password == password && x.Username == username).ToList();
+                if (user.Count == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Invalid password or Username");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+            } while (user.Count == 0);
+            Console.WriteLine($"Welcome {user[0].Username} to your system");
+
+        }
         public User SignUp()
         {
             string username; string password; List<User> item;
@@ -63,7 +84,7 @@ namespace ConsoleApp1
                         "letters' count must be equal 10");
                     Console.ForegroundColor = ConsoleColor.Green;
                 }
-            } while (!((CheckUsername(username))&& item.Count == 0));
+            } while (!((CheckUsername(username)) && item.Count == 0));
             do
             {
                 Console.Write("Password - >");
@@ -100,7 +121,6 @@ namespace ConsoleApp1
             using (StreamWriter sw = new StreamWriter("list5.json"))
             {
                 json.Serialize(sw, users);
-                //sw.WriteLine(json);
             }
         }
         public List<User> DeserializerFromJASON()
@@ -109,7 +129,6 @@ namespace ConsoleApp1
             using (StreamReader sr = new StreamReader("list5.json"))
             {
                 string str = sr.ReadToEnd();
-                // var mylist = json.Deserialize(str);
                 List<User> items = JsonConvert.DeserializeObject<List<User>>(str);
                 result = items;
             }
@@ -131,7 +150,7 @@ namespace ConsoleApp1
             }
             else if (selection == 4)
             {
-
+                SignIn();
             }
             Console.WriteLine("Show all users select 1 no 2");
             selection = Convert.ToInt32(Console.ReadLine());
@@ -143,20 +162,17 @@ namespace ConsoleApp1
                     item.ShowUserProperty();
                 }
             }
-            //else if (selection == 2)
-            //{
-            //}
+            else if (selection == 2)
+            {
+                Console.WriteLine("System out");
+            }
 
         }
-
-        /////
     }
     class Program
     {
         static void Main(string[] args)
         {
-
-
             Controller controller = new Controller();
             controller.run();
         }
