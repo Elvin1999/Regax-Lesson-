@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.IO;
 namespace ConsoleApp1
 {
-    class User
+    public class User
     {
         public User() { }
         public User(string username, string password)
@@ -16,8 +16,6 @@ namespace ConsoleApp1
             Username = username;
             Password = password;
         }
-        public string Username { get; set; }
-        public string Password { get; set; }
         public void ShowUserProperty()
         {
             Console.WriteLine("==========================");
@@ -29,44 +27,73 @@ namespace ConsoleApp1
             }
             Console.WriteLine();
         }
+        public string Username { get; set; }
+        public string Password { get; set; }
     }
     class Controller
     {
         JsonSerializer json = new JsonSerializer();
         List<User> users = new List<User>();
+        public Controller()
+        {
+            FileInfo fi = new FileInfo("list5.json");
+            if (!fi.Exists)
+            {
+                SerializerToJSON();
+            }
+        }
         public User SignUp()
         {
-            string username; string password;
+            string username; string password; List<User> item;
             do
             {
                 Console.Write("Username - >");
                 username = Console.ReadLine();
-            } while (!CheckUsername(username));
+                item = users.Where(x => x.Username == username).ToList();
+                if (item.Count != 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("This \"Username\" is already exist");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+                if (!CheckUsername(username))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Username must have at least one \"Uppercase letter and symbol\"\n" +
+                        "letters' count must be equal 10");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+            } while (!((CheckUsername(username))&& item.Count == 0));
             do
             {
                 Console.Write("Password - >");
                 password = Console.ReadLine();
-
+                if (!CheckPassword(password))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Password letters' count must be greater than 8 and at least one \"Uppercase letter\"");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
             } while (!CheckPassword(password));
             return new User(username, password);
         }
         public bool CheckUsername(string username)
         {
-            Regex name = new Regex(@"^[A-Z]{1}?[a-zA-Z]{7}?[!-/_]{1}");
+            Regex name = new Regex(@"^[A-Z]{1}?[a-zA-Z0-9]{8}?[!-/_]{1}");
             if (name.IsMatch(username))
             {
                 return true;
             }
-            return true;//test
+            return false;//test
         }
         public bool CheckPassword(string password)
         {
-            Regex pass = new Regex(@"^[a-zA-Z0-9]{8}?");
+            Regex pass = new Regex(@"^[A-Z]{1}?[a-zA-Z0-9]{7}?");
             if (pass.IsMatch(password))
             {
                 return true;
             }
-            return true;//test
+            return false;//test
         }
         public void SerializerToJSON()
         {
@@ -86,7 +113,6 @@ namespace ConsoleApp1
                 List<User> items = JsonConvert.DeserializeObject<List<User>>(str);
                 result = items;
             }
-
             return result;
         }
         public void run()
@@ -94,17 +120,21 @@ namespace ConsoleApp1
             //Console.WriteLine(Name.IsMatch("Audfgjka_"));
             //Console.WriteLine(pass.IsMatch("123456798798"));
             User user;
-            Console.WriteLine("For registreation select 3");
+            Console.WriteLine("SIGN UP 3  SIGN IN 4");
             int selection = Convert.ToInt32(Console.ReadLine());
             if (selection == 3)
             {
-                users = DeserializerFromJASON();              
+                users = DeserializerFromJASON();
                 user = SignUp();
                 users.Add(user);
                 SerializerToJSON();
             }
+            else if (selection == 4)
+            {
+
+            }
             Console.WriteLine("Show all users select 1 no 2");
-             selection = Convert.ToInt32(Console.ReadLine());
+            selection = Convert.ToInt32(Console.ReadLine());
             if (selection == 1)
             {
                 users = DeserializerFromJASON();
@@ -113,8 +143,9 @@ namespace ConsoleApp1
                     item.ShowUserProperty();
                 }
             }
-            else if (selection == 2) { 
-}
+            //else if (selection == 2)
+            //{
+            //}
 
         }
 
@@ -131,3 +162,4 @@ namespace ConsoleApp1
         }
     }
 }
+
